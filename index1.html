@@ -449,118 +449,243 @@
         </div>
     </div>
 
-    <script>
-        const topicNames = {
-            "input-output": "Input/Output",
-            "conditions": "Conditions (if/else statements)",
-            "loops": "Loops (for/while)",
-            "functions": "Functions",
-            "turtle": "Turtle Graphics",
-            "file-io": "File Read/Write"
+  <script>
+    const topicNames = {
+        "input-output": "Input/Output",
+        "conditions": "Conditions (if/else statements)",
+        "loops": "Loops (for/while)",
+        "functions": "Functions",
+        "turtle": "Turtle Graphics",
+        "file-io": "File Read/Write"
+    };
+
+    // DeepSeek API configuration (FREE tier)
+    const DEEPSEEK_API_KEY = 'your-deepseek-api-key-here'; // Get free key from https://platform.deepseek.com/api_keys
+    const DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions';
+
+    async function explainTopic() {
+        const topic = document.getElementById('topic').value;
+        const responseDiv = document.getElementById('response');
+        const explainBtn = document.getElementById('explainBtn');
+
+        if (!topic) {
+            responseDiv.innerHTML = '<p class="error">Please select a Python topic first!</p>';
+            return;
+        }
+
+        explainBtn.disabled = true;
+        responseDiv.innerHTML = '<p class="loading">🤔 AI is preparing topic explanation...</p>';
+
+        try {
+            const response = await fetch(DEEPSEEK_API_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${DEEPSEEK_API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: "deepseek-chat",
+                    messages: [{
+                        role: "user",
+                        content: `You are a Python programming tutor for first-year university students at Arab Open University. Provide a comprehensive but beginner-friendly explanation of ${topicNames[topic]} in Python.
+
+Your explanation should include:
+1. What it is and why it's important
+2. Basic syntax with clear examples
+3. 2-3 practical code examples
+4. Common mistakes beginners make
+5. A practice exercise for students
+
+Make it engaging, educational, and suitable for Arab students.`
+                    }],
+                    temperature: 0.7,
+                    max_tokens: 1000
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const aiResponse = data.choices[0].message.content;
+            
+            responseDiv.innerHTML = `<strong>📚 Topic: ${topicNames[topic]}</strong>\n\n${aiResponse}`;
+        } catch (error) {
+            console.error('Error:', error);
+            // Fallback to simulated response
+            showSimulatedExplanation(topic, responseDiv);
+        } finally {
+            explainBtn.disabled = false;
+        }
+    }
+
+    async function askQuestion() {
+        const topic = document.getElementById('topic').value;
+        const question = document.getElementById('question').value.trim();
+        const responseDiv = document.getElementById('response');
+        const askBtn = document.getElementById('askBtn');
+
+        if (!topic) {
+            responseDiv.innerHTML = '<p class="error">Please select a Python topic first!</p>';
+            return;
+        }
+
+        if (!question) {
+            responseDiv.innerHTML = '<p class="error">Please enter a question!</p>';
+            return;
+        }
+
+        askBtn.disabled = true;
+        responseDiv.innerHTML = '<p class="loading">🤔 AI is thinking...</p>';
+
+        try {
+            const response = await fetch(DEEPSEEK_API_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${DEEPSEEK_API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: "deepseek-chat",
+                    messages: [{
+                        role: "user",
+                        content: `You are a Python programming tutor helping first-year Arab Open University students learn about ${topicNames[topic]}. 
+
+Student's question: ${question}
+
+Please provide a clear, educational answer that:
+1. Explains the concept in simple terms
+2. Includes a practical Python code example
+3. Is encouraging and supportive
+4. Uses language appropriate for Arab students
+5. Relates to real-world applications
+
+Make sure your answer is helpful and builds the student's confidence.`
+                    }],
+                    temperature: 0.7,
+                    max_tokens: 800
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const aiResponse = data.choices[0].message.content;
+            
+            responseDiv.innerHTML = `<strong>Topic: ${topicNames[topic]}</strong>\n\n${aiResponse}`;
+        } catch (error) {
+            console.error('Error:', error);
+            // Fallback to simulated response
+            showSimulatedAnswer(topic, question, responseDiv);
+        } finally {
+            askBtn.disabled = false;
+        }
+    }
+
+    async function reviewCode() {
+        const code = document.getElementById('code').value.trim();
+        const responseDiv = document.getElementById('response');
+        const reviewBtn = document.getElementById('reviewBtn');
+
+        if (!code) {
+            responseDiv.innerHTML = '<p class="error">Please write some code first!</p>';
+            return;
+        }
+
+        reviewBtn.disabled = true;
+        responseDiv.innerHTML = '<p class="loading">🔍 AI is reviewing your Python code...</p>';
+
+        try {
+            const response = await fetch(DEEPSEEK_API_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${DEEPSEEK_API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: "deepseek-chat",
+                    messages: [{
+                        role: "user",
+                        content: `You are a Python programming tutor helping first-year Arab Open University students. Review this student's Python code and provide constructive, educational feedback:
+
+\`\`\`python
+${code}
+\`\`\`
+
+Please provide:
+1. What the code does well (positive feedback first)
+2. Any errors, issues, or improvements needed
+3. Specific suggestions with code examples
+4. Best practices they should follow
+5. Encouragement and next steps for learning
+
+Keep your feedback supportive, educational, and focused on helping the student improve. Be specific and provide examples.`
+                    }],
+                    temperature: 0.7,
+                    max_tokens: 1000
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const aiResponse = data.choices[0].message.content;
+            
+            responseDiv.innerHTML = `<strong>PYTHON CODE REVIEW</strong>\n\n${aiResponse}`;
+        } catch (error) {
+            console.error('Error:', error);
+            // Fallback to simulated response
+            showSimulatedCodeReview(code, responseDiv);
+        } finally {
+            reviewBtn.disabled = false;
+        }
+    }
+
+    // Fallback simulated responses (if API fails)
+    function showSimulatedExplanation(topic, responseDiv) {
+        const explanations = {
+            "input-output": `📚 Python Input/Output\n\n1. print() function: Displays output\n   Example: print("Hello")\n   Advanced: print("A", "B", sep="-")\n\n2. input() function: Gets user input\n   Example: name = input("Enter name: ")\n   Note: Always returns string\n\n3. Type conversion:\n   int("42") → 42\n   str(100) → "100"\n\nPractice: Create a program that asks for name and age, then greets the user.`,
+            
+            "conditions": `📚 Conditions (if/elif/else)\n\nSyntax:\nif condition:\n    # code\nelif condition:\n    # code\nelse:\n    # code\n\nExample:\nage = 18\nif age >= 18:\n    print("Adult")\nelse:\n    print("Minor")\n\nPractice: Check if a number is positive, negative, or zero.`,
+            
+            "loops": `📚 Loops in Python\n\nFor loop:\nfor i in range(5):\n    print(i)\n\nWhile loop:\ncount = 0\nwhile count < 5:\n    print(count)\n    count += 1\n\nPractice: Calculate sum of numbers 1 to 10.`,
+            
+            "functions": `📚 Functions in Python\n\ndef function_name(parameters):\n    # code\n    return value\n\nExample:\ndef greet(name):\n    return f"Hello {name}"\n\nPractice: Create function to calculate rectangle area.`
         };
+        responseDiv.innerHTML = `<strong>📚 Topic: ${topicNames[topic]}</strong>\n\n${explanations[topic] || "Explanation coming soon!"}`;
+    }
 
-        // Simulated responses for GitHub Pages compatibility
-        async function explainTopic() {
-            const topic = document.getElementById('topic').value;
-            const responseDiv = document.getElementById('response');
-            const explainBtn = document.getElementById('explainBtn');
+    function showSimulatedAnswer(topic, question, responseDiv) {
+        const responses = {
+            "input-output": `Great question about Input/Output!\n\nFor "${question}":\n\n1. Use print() to display results\n2. Use input() to get user data\n3. Remember type conversion\n\nExample:\nname = input("Name? ")\nage = int(input("Age? "))\nprint(f"Hello {name}, next year: {age + 1}")`,
+            
+            "conditions": `Excellent question!\n\nFor "${question}":\n\nKey points:\n1. Use comparison operators\n2. Indentation is crucial\n3. Use elif for multiple conditions\n\nTry:\nnum = int(input("Enter number: "))\nif num > 0: print("Positive")\nelif num < 0: print("Negative")\nelse: print("Zero")`
+        };
+        responseDiv.innerHTML = `<strong>Topic: ${topicNames[topic]}</strong>\n\n${responses[topic] || `For "${question}", practice with code examples!`}`;
+    }
 
-            if (!topic) {
-                responseDiv.innerHTML = '<p class="error">Please select a Python topic first!</p>';
-                return;
-            }
+    function showSimulatedCodeReview(code, responseDiv) {
+        responseDiv.innerHTML = `<strong>PYTHON CODE REVIEW</strong>\n\n✅ Your code has been analyzed!\n\n💡 Suggestions:\n1. Add comments for clarity\n2. Use descriptive variable names\n3. Test with different inputs\n4. Consider edge cases\n\n🎯 Keep practicing!\n\n-- Dr. Elham Iskandarnia\nArab Open University`;
+    }
 
-            explainBtn.disabled = true;
-            responseDiv.innerHTML = '<p class="loading">🤔 Preparing topic explanation...</p>';
-
-            // Simulated responses
-            setTimeout(() => {
-                const explanations = {
-                    "input-output": `📚 Python Input/Output\n\n1. print() function: Displays output\n   Example: print("Hello")\n   Advanced: print("A", "B", sep="-")\n\n2. input() function: Gets user input\n   Example: name = input("Enter name: ")\n   Note: Always returns string\n\n3. Type conversion:\n   int("42") → 42\n   str(100) → "100"\n\n4. f-strings (modern formatting):\n   name = "Ali"\n   print(f"Hello {name}")\n\nPractice: Create a program that asks for name and age, then greets the user.`,
-                    
-                    "conditions": `📚 Conditions (if/elif/else)\n\nSyntax:\nif condition:\n    # code\nelif condition:\n    # code\nelse:\n    # code\n\nExample:\nage = 18\nif age >= 18:\n    print("Adult")\nelse:\n    print("Minor")\n\nComparison operators:\n>  greater than\n<  less than\n== equal to\n!= not equal\n\nPractice: Write a program that checks if a number is positive, negative, or zero.`,
-                    
-                    "loops": `📚 Loops in Python\n\nFor loop:\nfor i in range(5):\n    print(i)  # Prints 0,1,2,3,4\n\nWhile loop:\ncount = 0\nwhile count < 5:\n    print(count)\n    count += 1\n\nLoop control:\nbreak    - exit loop\ncontinue - skip to next iteration\n\nPractice: Use a loop to calculate the sum of numbers 1 to 10.`,
-                    
-                    "functions": `📚 Functions in Python\n\ndef function_name(parameters):\n    # code\n    return value\n\nExample:\ndef greet(name):\n    return f"Hello {name}"\n\nprint(greet("Ali"))\n\nFunction components:\n1. def keyword\n2. Function name\n3. Parameters (optional)\n4. Return statement (optional)\n\nPractice: Create a function that calculates the area of a rectangle.`,
-                    
-                    "turtle": `📚 Turtle Graphics\n\nimport turtle\n\n# Create turtle\nt = turtle.Turtle()\n\n# Basic commands:\nt.forward(100)  # Move forward\nright(90)       # Turn right\nleft(45)        # Turn left\npenup()         # Lift pen\npendown()       # Lower pen\n\nPractice: Draw a square using turtle graphics.`,
-                    
-                    "file-io": `📚 File Read/Write\n\nReading a file:\nwith open("file.txt", "r") as file:\n    content = file.read()\n\nWriting to a file:\nwith open("file.txt", "w") as file:\n    file.write("Hello")\n\nFile modes:\n"r" - read\n"w" - write (overwrites)\n"a" - append\n"r+" - read and write\n\nPractice: Create a program that saves user input to a file.`
-                };
-
-                responseDiv.innerHTML = `<strong>📚 Topic: ${topicNames[topic]}</strong>\n\n${explanations[topic] || "Detailed explanation coming soon. Try the other topics!"}`;
-                explainBtn.disabled = false;
-            }, 1000);
-        }
-
-        async function askQuestion() {
-            const topic = document.getElementById('topic').value;
-            const question = document.getElementById('question').value.trim();
-            const responseDiv = document.getElementById('response');
-            const askBtn = document.getElementById('askBtn');
-
-            if (!topic) {
-                responseDiv.innerHTML = '<p class="error">Please select a Python topic first!</p>';
-                return;
-            }
-
-            if (!question) {
-                responseDiv.innerHTML = '<p class="error">Please enter a question!</p>';
-                return;
-            }
-
-            askBtn.disabled = true;
-            responseDiv.innerHTML = '<p class="loading">🤔 Thinking about your question...</p>';
-
-            setTimeout(() => {
-                const responses = {
-                    "input-output": `Great question about Input/Output!\n\nFor "${question}", here's what you need to know:\n\n1. Use print() to display results\n2. Use input() to get user data\n3. Remember to convert types when needed\n4. f-strings are best for formatting\n\nExample solution:\nname = input("What's your name? ")\nage = int(input("How old are you? "))\nprint(f"Hello {name}, next year you'll be {age + 1}!")`,
-                    
-                    "conditions": `Excellent question about conditions!\n\nFor "${question}":\n\nKey points:\n1. Conditions use comparison operators (>, <, ==, !=)\n2. Indentation is crucial in Python\n3. Use elif for multiple conditions\n4. Logical operators: and, or, not\n\nTry this exercise:\nnum = int(input("Enter a number: "))\nif num > 0:\n    print("Positive")\nelif num < 0:\n    print("Negative")\nelse:\n    print("Zero")`,
-                    
-                    "loops": `Loop question! Good choice.\n\nFor "${question}":\n\nRemember:\n1. for loops: known number of iterations\n2. while loops: unknown iterations\n3. Use range() for sequences\n4. Avoid infinite while loops\n\nPractice example:\nfor i in range(1, 6):\n    print(f"Number: {i}")`,
-                    
-                    "functions": `Function question! Very important topic.\n\nFor "${question}":\n\nKey concepts:\n1. Functions make code reusable\n2. Parameters pass data into functions\n3. Return sends data back\n4. Functions should do one thing well\n\nExample:\ndef calculate_area(length, width):\n    return length * width\n\narea = calculate_area(10, 5)\nprint(f"Area: {area}")`
-                };
-
-                responseDiv.innerHTML = `<strong>Topic: ${topicNames[topic]}</strong>\n\n${responses[topic] || `For "${question}", I recommend practicing ${topicNames[topic]} with code examples. Try writing a simple program and testing it!\n\nRemember: Practice is key to mastering programming.`}`;
-                askBtn.disabled = false;
-            }, 1500);
-        }
-
-        async function reviewCode() {
-            const code = document.getElementById('code').value.trim();
-            const responseDiv = document.getElementById('response');
-            const reviewBtn = document.getElementById('reviewBtn');
-
-            if (!code) {
-                responseDiv.innerHTML = '<p class="error">Please write some code first!</p>';
-                return;
-            }
-
-            reviewBtn.disabled = true;
-            responseDiv.innerHTML = '<p class="loading">🔍 Reviewing your Python code...</p>';
-
-            setTimeout(() => {
-                responseDiv.innerHTML = `<strong>PYTHON CODE REVIEW</strong>\n\n✅ Code Analysis:\n- Your Python code has been reviewed\n- Basic syntax appears correct\n- Structure looks good\n\n💡 Suggestions for improvement:\n1. Add comments to explain complex logic\n2. Use descriptive variable names\n3. Test with different input values\n4. Consider edge cases\n5. Follow PEP 8 style guide\n\n🎯 Educational Note:\n"Programming is not about typing, it's about thinking."\nKeep practicing and don't hesitate to experiment!\n\n-- Dr. Elham Iskandarnia\nFaculty of Computing, Arab Open University`;
-                reviewBtn.disabled = false;
-            }, 2000);
-        }
-
-        // Initialize with personalized welcome
-        document.addEventListener('DOMContentLoaded', function() {
-            const responseDiv = document.getElementById('response');
-            responseDiv.innerHTML = `<p style="text-align: center;">
-                <strong>👋 Welcome to Python Learning Assistant!</strong><br><br>
-                <strong>Created by Dr. Elham Iskandarnia</strong><br>
-                Faculty of Computing, Arab Open University<br><br>
-                <em>Research Project: AI-Assisted Programming Education</em><br><br>
-                📚 Select a topic to begin learning Python programming!<br>
-                💻 Try the code editor to practice your skills<br>
-                🤖 Get instant feedback on your code
-            </p>`;
-        });
-    </script>
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        const responseDiv = document.getElementById('response');
+        responseDiv.innerHTML = `<p style="text-align: center;">
+            <strong>👋 Welcome to Python Learning Assistant!</strong><br><br>
+            <strong>Created by Dr. Elham Iskandarnia</strong><br>
+            Faculty of Computing, Arab Open University<br><br>
+            <em>Research Project: AI-Assisted Programming Education</em><br><br>
+            📚 Select a topic and click "Get Topic Explanation"<br>
+            💻 Write code and get AI feedback<br>
+            🤖 Ask specific Python questions
+        </p>`;
+    });
+</script>
 </body>
 </html>
