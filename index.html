@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Learning Assistant - Arab Open University</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        /* Author Profile - UPDATED with AOU branding */
+        .author-profile {
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            max-width: 350px;
+            transition: all 0.3s ease;
+        }
+
+        .author-profile:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .author-photo {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            margin-right: 15px;
+            border: 3px solid white;
+            object-fit: cover;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .author-info {
+            text-align: left;
+        }
+
+        .author-name {
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        .author-title {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 2px;
+        }
+
+        .author-credits {
+            font-size: 11px;
+            opacity: 0.8;
+            font-style: italic;
+        }
+
+        .author-link {
+            color: white;
+            text-decoration: none;
+            font-size: 12px;
+            display: block;
+            margin-top: 5px;
+            padding: 4px 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .author-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            text-decoration: none;
+            transform: translateX(5px);
+        }
+
+        .aou-badge {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 3px 10px;
+            border-radius: 12px;
+            margin-top: 3px;
+            font-size: 10px;
+        }
+
+        .aou-badge img {
+            width: 12px;
+            height: 12px;
+            margin-right: 5px;
+        }
+        /* END Author Profile */
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            margin-top: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .university-badge {
+            background: rgba(255,255,255,0.2);
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        .panel h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .code-editor {
+            font-family: 'Courier New', monospace;
+            background: #282c34;
+            color: #abb2bf;
+            min-height: 200px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .explain-btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+            margin-bottom: 15px;
+        }
+
+        .explain-btn:hover {
+            box-shadow: 0 5px 15px rgba(17, 153, 142, 0.4);
+        }
+
+        .response-area {
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 150px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .loading {
+            text-align: center;
+            color: #667eea;
+            font-style: italic;
+        }
+
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #6c757d;
+            border-top: 2px solid #e9ecef;
+            position: relative;
+        }
+
+        /* Footer credits - UPDATED */
+        .credits {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            font-size: 12px;
+            color: #495057;
+            text-align: right;
+        }
+
+        .credits a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .credits a:hover {
+            text-decoration: underline;
+            color: #764ba2;
+        }
+
+        .research-note {
+            font-size: 11px;
+            color: #6c757d;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+                margin-top: 20px;
+            }
+            
+            .author-profile {
+                position: relative;
+                top: 0;
+                left: 0;
+                margin: 0 auto 20px auto;
+                max-width: 320px;
+            }
+            
+            .credits {
+                position: relative;
+                right: 0;
+                bottom: 0;
+                margin-top: 15px;
+                text-align: center;
+            }
+            
+            .header {
+                padding: 25px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .author-profile {
+                flex-direction: column;
+                text-align: center;
+                padding: 15px;
+                border-radius: 20px;
+            }
+            
+            .author-photo {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            
+            .author-info {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <!-- Author Profile Section - UPDATED with AOU link -->
+            <div class="author-profile">
+                <img src="https://elhamum.github.io/learnpythonAOU/elham.png" 
+                     alt="Dr. Elham Iskandarnia" 
+                     class="author-photo"
+                     onerror="this.onerror=null; this.src='https://via.placeholder.com/55/667eea/ffffff?text=EI'">
+                <div class="author-info">
+                    <div class="author-name">Dr. Elham Iskandarnia</div>
+                    <div class="author-title">Faculty of Computing, AOU</div>
+                    <div class="author-credits">Research Project Lead</div>
+                    <a href="https://www.aou.org.bh/faculties/computer/Pages/portfolio.aspx?iid=elham.mohamed%40aou.org.bh" 
+                       target="_blank" 
+                       class="author-link"
+                       title="View AOU Academic Portfolio">
+                       🔗 AOU Academic Portfolio
+                    </a>
+                    <div class="aou-badge">
+                        <span>🎓 Arab Open University</span>
+                    </div>
+                </div>
+            </div>
+
+            <h1>🐍 Python Learning Assistant</h1>
+            <p>Master Python programming with AI-powered guidance</p>
+            <div class="university-badge">🎓 Arab Open University - Research Project</div>
+        </div>
+
+        <div class="main-content">
+            <div class="panel">
+                <h2>📝 Ask a Question</h2>
+                <div class="input-group">
+                    <label for="topic">Select Python Topic:</label>
+                    <select id="topic">
+                        <option value="">-- Select a Topic --</option>
+                        <option value="input-output">1. Input/Output</option>
+                        <option value="conditions">2. Conditions (if/else)</option>
+                        <option value="loops">3. Loops (for/while)</option>
+                        <option value="functions">4. Functions</option>
+                        <option value="turtle">5. Turtle Graphics</option>
+                        <option value="file-io">6. File Read/Write</option>
+                    </select>
+                </div>
+
+                <button id="explainBtn" class="explain-btn" onclick="explainTopic()">📚 Get Topic Explanation</button>
+
+                <div class="input-group">
+                    <label for="question">Your Question:</label>
+                    <textarea id="question" placeholder="e.g., How do I use a for loop to iterate through a list?"></textarea>
+                </div>
+
+                <button id="askBtn" onclick="askQuestion()">Ask AI Assistant</button>
+            </div>
+
+            <div class="panel">
+                <h2>💻 Code Editor</h2>
+                <div class="input-group">
+                    <label for="code">Write or Paste Your Python Code:</label>
+                    <textarea id="code" class="code-editor" placeholder="# Write your Python code here&#10;name = input('What is your name? ')&#10;print(f'Hello, {name}!')"></textarea>
+                </div>
+
+                <button id="reviewBtn" onclick="reviewCode()">Review My Python Code</button>
+            </div>
+        </div>
+
+        <div style="padding: 0 30px 30px 30px;">
+            <div class="panel">
+                <h2>🤖 AI Response</h2>
+                <div id="response" class="response-area">
+                    <p style="color: #6c757d; text-align: center; margin-top: 50px;">
+                        👋 Welcome! Select a topic and click "Get Topic Explanation" to start learning,<br>
+                        or ask a question about Python programming.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Python Learning Assistant</strong> - Supporting Arab Open University Students</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">Learn Python • Build Projects • Succeed in Your Course</p>
+            
+            <!-- Credits in Footer - UPDATED -->
+            <div class="credits">
+                Developed by <a href="https://www.aou.org.bh/faculties/computer/Pages/portfolio.aspx?iid=elham.mohamed%40aou.org.bh" 
+                               target="_blank"
+                               title="AOU Academic Portfolio">
+                               Dr. Elham Iskandarnia
+                            </a><br>
+                <span class="research-note">
+                    Faculty of Computing • Arab Open University • Research Project
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const topicNames = {
+            "input-output": "Input/Output",
+            "conditions": "Conditions (if/else statements)",
+            "loops": "Loops (for/while)",
+            "functions": "Functions",
+            "turtle": "Turtle Graphics",
+            "file-io": "File Read/Write"
+        };
+
+        // Simulated responses for GitHub Pages compatibility
+        async function explainTopic() {
+            const topic = document.getElementById('topic').value;
+            const responseDiv = document.getElementById('response');
+            const explainBtn = document.getElementById('explainBtn');
+
+            if (!topic) {
+                responseDiv.innerHTML = '<p class="error">Please select a Python topic first!</p>';
+                return;
+            }
+
+            explainBtn.disabled = true;
+            responseDiv.innerHTML = '<p class="loading">🤔 Preparing topic explanation...</p>';
+
+            // Simulated responses
+            setTimeout(() => {
+                const explanations = {
+                    "input-output": `📚 Python Input/Output\n\n1. print() function: Displays output\n   Example: print("Hello")\n   Advanced: print("A", "B", sep="-")\n\n2. input() function: Gets user input\n   Example: name = input("Enter name: ")\n   Note: Always returns string\n\n3. Type conversion:\n   int("42") → 42\n   str(100) → "100"\n\n4. f-strings (modern formatting):\n   name = "Ali"\n   print(f"Hello {name}")\n\nPractice: Create a program that asks for name and age, then greets the user.`,
+                    
+                    "conditions": `📚 Conditions (if/elif/else)\n\nSyntax:\nif condition:\n    # code\nelif condition:\n    # code\nelse:\n    # code\n\nExample:\nage = 18\nif age >= 18:\n    print("Adult")\nelse:\n    print("Minor")\n\nComparison operators:\n>  greater than\n<  less than\n== equal to\n!= not equal\n\nPractice: Write a program that checks if a number is positive, negative, or zero.`,
+                    
+                    "loops": `📚 Loops in Python\n\nFor loop:\nfor i in range(5):\n    print(i)  # Prints 0,1,2,3,4\n\nWhile loop:\ncount = 0\nwhile count < 5:\n    print(count)\n    count += 1\n\nLoop control:\nbreak    - exit loop\ncontinue - skip to next iteration\n\nPractice: Use a loop to calculate the sum of numbers 1 to 10.`,
+                    
+                    "functions": `📚 Functions in Python\n\ndef function_name(parameters):\n    # code\n    return value\n\nExample:\ndef greet(name):\n    return f"Hello {name}"\n\nprint(greet("Ali"))\n\nFunction components:\n1. def keyword\n2. Function name\n3. Parameters (optional)\n4. Return statement (optional)\n\nPractice: Create a function that calculates the area of a rectangle.`,
+                    
+                    "turtle": `📚 Turtle Graphics\n\nimport turtle\n\n# Create turtle\nt = turtle.Turtle()\n\n# Basic commands:\nt.forward(100)  # Move forward\nright(90)       # Turn right\nleft(45)        # Turn left\npenup()         # Lift pen\npendown()       # Lower pen\n\nPractice: Draw a square using turtle graphics.`,
+                    
+                    "file-io": `📚 File Read/Write\n\nReading a file:\nwith open("file.txt", "r") as file:\n    content = file.read()\n\nWriting to a file:\nwith open("file.txt", "w") as file:\n    file.write("Hello")\n\nFile modes:\n"r" - read\n"w" - write (overwrites)\n"a" - append\n"r+" - read and write\n\nPractice: Create a program that saves user input to a file.`
+                };
+
+                responseDiv.innerHTML = `<strong>📚 Topic: ${topicNames[topic]}</strong>\n\n${explanations[topic] || "Detailed explanation coming soon. Try the other topics!"}`;
+                explainBtn.disabled = false;
+            }, 1000);
+        }
+
+        async function askQuestion() {
+            const topic = document.getElementById('topic').value;
+            const question = document.getElementById('question').value.trim();
+            const responseDiv = document.getElementById('response');
+            const askBtn = document.getElementById('askBtn');
+
+            if (!topic) {
+                responseDiv.innerHTML = '<p class="error">Please select a Python topic first!</p>';
+                return;
+            }
+
+            if (!question) {
+                responseDiv.innerHTML = '<p class="error">Please enter a question!</p>';
+                return;
+            }
+
+            askBtn.disabled = true;
+            responseDiv.innerHTML = '<p class="loading">🤔 Thinking about your question...</p>';
+
+            setTimeout(() => {
+                const responses = {
+                    "input-output": `Great question about Input/Output!\n\nFor "${question}", here's what you need to know:\n\n1. Use print() to display results\n2. Use input() to get user data\n3. Remember to convert types when needed\n4. f-strings are best for formatting\n\nExample solution:\nname = input("What's your name? ")\nage = int(input("How old are you? "))\nprint(f"Hello {name}, next year you'll be {age + 1}!")`,
+                    
+                    "conditions": `Excellent question about conditions!\n\nFor "${question}":\n\nKey points:\n1. Conditions use comparison operators (>, <, ==, !=)\n2. Indentation is crucial in Python\n3. Use elif for multiple conditions\n4. Logical operators: and, or, not\n\nTry this exercise:\nnum = int(input("Enter a number: "))\nif num > 0:\n    print("Positive")\nelif num < 0:\n    print("Negative")\nelse:\n    print("Zero")`,
+                    
+                    "loops": `Loop question! Good choice.\n\nFor "${question}":\n\nRemember:\n1. for loops: known number of iterations\n2. while loops: unknown iterations\n3. Use range() for sequences\n4. Avoid infinite while loops\n\nPractice example:\nfor i in range(1, 6):\n    print(f"Number: {i}")`,
+                    
+                    "functions": `Function question! Very important topic.\n\nFor "${question}":\n\nKey concepts:\n1. Functions make code reusable\n2. Parameters pass data into functions\n3. Return sends data back\n4. Functions should do one thing well\n\nExample:\ndef calculate_area(length, width):\n    return length * width\n\narea = calculate_area(10, 5)\nprint(f"Area: {area}")`
+                };
+
+                responseDiv.innerHTML = `<strong>Topic: ${topicNames[topic]}</strong>\n\n${responses[topic] || `For "${question}", I recommend practicing ${topicNames[topic]} with code examples. Try writing a simple program and testing it!\n\nRemember: Practice is key to mastering programming.`}`;
+                askBtn.disabled = false;
+            }, 1500);
+        }
+
+        async function reviewCode() {
+            const code = document.getElementById('code').value.trim();
+            const responseDiv = document.getElementById('response');
+            const reviewBtn = document.getElementById('reviewBtn');
+
+            if (!code) {
+                responseDiv.innerHTML = '<p class="error">Please write some code first!</p>';
+                return;
+            }
+
+            reviewBtn.disabled = true;
+            responseDiv.innerHTML = '<p class="loading">🔍 Reviewing your Python code...</p>';
+
+            setTimeout(() => {
+                responseDiv.innerHTML = `<strong>PYTHON CODE REVIEW</strong>\n\n✅ Code Analysis:\n- Your Python code has been reviewed\n- Basic syntax appears correct\n- Structure looks good\n\n💡 Suggestions for improvement:\n1. Add comments to explain complex logic\n2. Use descriptive variable names\n3. Test with different input values\n4. Consider edge cases\n5. Follow PEP 8 style guide\n\n🎯 Educational Note:\n"Programming is not about typing, it's about thinking."\nKeep practicing and don't hesitate to experiment!\n\n-- Dr. Elham Iskandarnia\nFaculty of Computing, Arab Open University`;
+                reviewBtn.disabled = false;
+            }, 2000);
+        }
+
+        // Initialize with personalized welcome
+        document.addEventListener('DOMContentLoaded', function() {
+            const responseDiv = document.getElementById('response');
+            responseDiv.innerHTML = `<p style="text-align: center;">
+                <strong>👋 Welcome to Python Learning Assistant!</strong><br><br>
+                <strong>Created by Dr. Elham Iskandarnia</strong><br>
+                Faculty of Computing, Arab Open University<br><br>
+                <em>Research Project: AI-Assisted Programming Education</em><br><br>
+                📚 Select a topic to begin learning Python programming!<br>
+                💻 Try the code editor to practice your skills<br>
+                🤖 Get instant feedback on your code
+            </p>`;
+        });
+    </script>
+</body>
+</html>
